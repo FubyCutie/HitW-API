@@ -48,19 +48,19 @@ public class Main extends JavaPlugin {
 
         Spark.get("/whitelistadd", (req, res) -> {
             final String token = req.queryParams("token");
-            final String uuid = req.queryParams("uuid");
+            final String name = req.queryParams("name");
 
             if (token == null || !token.equals(TOKEN)) {
                 res.status(401);
                 return "Inavlid token";
             }
 
-            if (uuid == null) {
+            if (name == null) {
                 res.status(400);
-                return "Missing parameter 'uuid'";
+                return "Missing parameter 'name'";
             }
 
-            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+            OfflinePlayer player = Bukkit.getOfflinePlayer(name);
 
             if (player == null) {
                 res.status(400);
@@ -68,25 +68,26 @@ public class Main extends JavaPlugin {
             }
 
             player.setWhitelisted(true);
+            Bukkit.getServer().reloadWhitelist();
 
             return "Player added to the whitelist";
         });
 
         Spark.get("/whitelistremove", (req, res) -> {
             final String token = req.queryParams("token");
-            final String uuid = req.queryParams("uuid");
+            final String name = req.queryParams("name");
 
             if (token == null || !token.equals(TOKEN)) {
                 res.status(401);
                 return "Inavlid token";
             }
 
-            if (uuid == null) {
+            if (name == null) {
                 res.status(400);
-                return "Missing parameter 'uuid'";
+                return "Missing parameter 'name'";
             }
 
-            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+            OfflinePlayer player = Bukkit.getOfflinePlayer(name);
 
             if (player == null) {
                 res.status(400);
@@ -94,6 +95,7 @@ public class Main extends JavaPlugin {
             }
 
             player.setWhitelisted(false);
+            Bukkit.getServer().reloadWhitelist();
 
             return "Player removed from the whitelist";
         });
@@ -107,6 +109,7 @@ public class Main extends JavaPlugin {
             }
 
             Bukkit.getServer().setWhitelist(true);
+            Bukkit.getServer().reloadWhitelist();
 
             return "Server whitelist enabled";
         });
@@ -120,6 +123,7 @@ public class Main extends JavaPlugin {
             }
 
             Bukkit.getServer().setWhitelist(false);
+            Bukkit.getServer().reloadWhitelist();
 
             return "Server whitelist disabled";
         });
