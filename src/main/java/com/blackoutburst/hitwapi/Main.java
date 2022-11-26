@@ -50,7 +50,7 @@ public class Main extends JavaPlugin {
             final String token = req.queryParams("token");
             final String uuid = req.queryParams("uuid");
 
-            if (token == null && !token.equals(TOKEN)) {
+            if (token == null || !token.equals(TOKEN)) {
                 res.status(401);
                 return "Inavlid token";
             }
@@ -76,7 +76,7 @@ public class Main extends JavaPlugin {
             final String token = req.queryParams("token");
             final String uuid = req.queryParams("uuid");
 
-            if (token == null && !token.equals(TOKEN)) {
+            if (token == null || !token.equals(TOKEN)) {
                 res.status(401);
                 return "Inavlid token";
             }
@@ -101,7 +101,7 @@ public class Main extends JavaPlugin {
         Spark.get("/whitelistenable", (req, res) -> {
             final String token = req.queryParams("token");
 
-            if (token == null && !token.equals(TOKEN)) {
+            if (token == null || !token.equals(TOKEN)) {
                 res.status(401);
                 return "Inavlid token";
             }
@@ -114,7 +114,7 @@ public class Main extends JavaPlugin {
         Spark.get("/whitelistdisable", (req, res) -> {
             final String token = req.queryParams("token");
 
-            if (token == null && !token.equals(TOKEN)) {
+            if (token == null || !token.equals(TOKEN)) {
                 res.status(401);
                 return "Inavlid token";
             }
