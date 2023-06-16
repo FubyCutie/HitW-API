@@ -3,14 +3,14 @@ package com.blackoutburst.hitwapi;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import spark.Spark;
 
-import java.io.File;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 public class Main extends JavaPlugin {
 
@@ -27,9 +27,32 @@ public class Main extends JavaPlugin {
         return null;
     }
 
+    private static String readCompressed() {
+        try (FileInputStream fis = new FileInputStream("./plugins/HitW/analytics.gz");
+             GZIPInputStream gis = new GZIPInputStream(fis);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(gis))) {
+
+            return reader.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void onEnable() {
-        Spark.port(30100);
+        Spark.port(30150);
+
+        Spark.get("/analytics", (req, res) -> {
+            final String token = req.queryParams("token");
+
+            if (token == null || !token.equals(TOKEN)) {
+                res.status(401);
+                return "Inavlid token";
+            }
+
+            return readCompressed();
+        });
+
         Spark.get("/user", (req, res) -> {
             final String uuid = req.queryParams("uuid");
             if (uuid == null) {
