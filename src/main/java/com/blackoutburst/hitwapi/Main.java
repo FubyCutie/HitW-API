@@ -14,12 +14,13 @@ import java.util.zip.GZIPInputStream;
 
 public class Main extends JavaPlugin {
 
-    public static String TOKEN = readEnv();
+    public static String TOKEN = readEnv(0);
+    public static String PORT = readEnv(1);
 
-    private static String readEnv() {
+    private static String readEnv(int index) {
         try {
             List<String> lines = Files.readAllLines(Paths.get(".env"));
-            return lines.get(0).split("=")[1].replace("\"", "");
+            return lines.get(index).split("=")[1].replace("\"", "");
         } catch (Exception e) {
             System.err.println("Invalid .env file");
             System.exit(0);
@@ -40,7 +41,7 @@ public class Main extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        Spark.port(30150);
+        Spark.port(Integer.parseInt(PORT));
 
         Spark.get("/analytics", (req, res) -> {
             final String token = req.queryParams("token");
