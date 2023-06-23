@@ -1,14 +1,19 @@
 package com.blackoutburst.hitwapi;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.eclipse.jetty.util.ajax.JSON;
 import spark.Spark;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -42,6 +47,48 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         Spark.port(Integer.parseInt(PORT));
+
+        Spark.get("/credits", (req, res) -> {
+            String uuid = req.queryParams("uuid");
+
+            if (uuid == null) {
+                res.status(400);
+                return "Missing parameter 'uuid'";
+            }
+
+            if (!uuid.contains("-")) {
+                char[] givenUUID = uuid.toCharArray();
+                char[] dashedUUID = new char[36];
+                dashedUUID[8] = '-';
+                dashedUUID[13] = '-';
+                dashedUUID[18] = '-';
+                dashedUUID[23] = '-';
+                System.arraycopy(givenUUID, 0, dashedUUID, 0, 8);
+                System.arraycopy(givenUUID, 8, dashedUUID, 9, 4);
+                System.arraycopy(givenUUID, 12, dashedUUID, 14, 4);
+                System.arraycopy(givenUUID, 16, dashedUUID, 19, 4);
+                System.arraycopy(givenUUID, 20, dashedUUID, 24, 12);
+                uuid = String.copyValueOf(dashedUUID);
+            }
+
+            final File file = new File("./plugins/HitW/playerdata/"+uuid+".json");
+            if (!file.exists()) {
+                return "null";
+            }
+
+            List<String> lines = Files.readAllLines(file.toPath());
+            StringBuilder s = new StringBuilder();
+            lines.forEach(s::append);
+            String fileContents = s.toString();
+
+            JsonParser parser = new JsonParser();
+            JsonObject data = parser.parse(fileContents).getAsJsonObject().get("data").getAsJsonObject();
+
+            int credits = data.get("credits").getAsInt();
+            int creditsEarned = data.get("creditsEarned").getAsInt();
+
+            return credits + ", " + creditsEarned;
+        });
 
         Spark.get("/analytics", (req, res) -> {
             final String token = req.queryParams("token");
