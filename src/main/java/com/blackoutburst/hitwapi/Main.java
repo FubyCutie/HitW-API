@@ -68,12 +68,12 @@ public class Main extends JavaPlugin {
                 System.arraycopy(givenUUID, 12, dashedUUID, 14, 4);
                 System.arraycopy(givenUUID, 16, dashedUUID, 19, 4);
                 System.arraycopy(givenUUID, 20, dashedUUID, 24, 12);
-                uuid = String.copyValueOf(dashedUUID);
+                uuid = new String(dashedUUID);
             }
 
             final File file = new File("./plugins/HitW/playerdata/"+uuid+".json");
             if (!file.exists()) {
-                return "null";
+                return "0, 0";
             }
 
             List<String> lines = Files.readAllLines(file.toPath());
