@@ -1,19 +1,16 @@
 package com.blackoutburst.hitwapi;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.eclipse.jetty.util.ajax.JSON;
 import spark.Spark;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
@@ -200,6 +197,45 @@ public class Main extends JavaPlugin {
         });
     }
 
+    private String credits(String uuid) {
+        if (!uuid.contains("-")) {
+            char[] givenUUID = uuid.toCharArray();
+            char[] dashedUUID = new char[36];
+            dashedUUID[8] = '-';
+            dashedUUID[13] = '-';
+            dashedUUID[18] = '-';
+            dashedUUID[23] = '-';
+            System.arraycopy(givenUUID, 0, dashedUUID, 0, 8);
+            System.arraycopy(givenUUID, 8, dashedUUID, 9, 4);
+            System.arraycopy(givenUUID, 12, dashedUUID, 14, 4);
+            System.arraycopy(givenUUID, 16, dashedUUID, 19, 4);
+            System.arraycopy(givenUUID, 20, dashedUUID, 24, 12);
+            uuid = String.copyValueOf(dashedUUID);
+        }
+
+        final File file = new File("./plugins/HitW/playerdata/"+uuid+".json");
+        if (!file.exists()) {
+            return "null";
+        }
+
+        try {
+            List<String> lines = Files.readAllLines(file.toPath());
+            StringBuilder s = new StringBuilder();
+            lines.forEach(s::append);
+            String fileContents = s.toString();
+
+            JsonParser parser = new JsonParser();
+            JsonObject data = parser.parse(fileContents).getAsJsonObject().get("data").getAsJsonObject();
+
+            int credits = data.get("credits").getAsInt();
+            int creditsEarned = data.get("creditsEarned").getAsInt();
+
+            return credits + ", " + creditsEarned;
+        } catch(Exception e) {
+            return "0, 0";
+        }
+    }
+
     private String generateAssJson(final File file, final String uuid) {
         final YamlConfiguration playerData = YamlConfiguration.loadConfiguration(file);
         final int Q = playerData.getInt("score.Q", 0);
@@ -208,6 +244,9 @@ public class Main extends JavaPlugin {
         final int L = playerData.getInt("score.L", 0);
         final int WF = playerData.getInt("score.WF", 0);
         final String name = playerData.getString("name");
+        final int credit = Integer.parseInt(credits(uuid).split(", ")[0]);
+        final int creditEarned = Integer.parseInt(credits(uuid).split(", ")[1]);
+
 
         String qh = "";
         for (int i = 1; i <= 100; i++) qh += playerData.getInt("qualification_history."+i, 0)+",";
@@ -242,7 +281,9 @@ public class Main extends JavaPlugin {
                 + "\"finals\":"+F+","
                 + "\"wide_qualification\":"+WQ+","
                 + "\"lobby\":"+L+","
-                + "\"wide_finals\":"+WF
+                + "\"wide_finals\":"+WF+","
+                + "\"credit\":"+credit+","
+                + "\"credit_earned\":"+creditEarned
                 + "}"
                 + "}";
     }
