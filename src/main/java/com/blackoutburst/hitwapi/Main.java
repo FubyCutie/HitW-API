@@ -94,9 +94,9 @@ public class Main extends JavaPlugin {
             JsonObject data = parser.parse(fileContents).getAsJsonObject().get("data").getAsJsonObject();
 
             JsonElement month = data.get("month");
-            if (month == null) return "0, 0";
-            if (month.getAsInt() != currentMonth) return "0, 0";
-
+            if (month != null) {
+                if (month.getAsInt() != currentMonth) return "0, 0";
+            }
             int creditsEarned = data.get("creditsEarned").getAsInt();
 
             return creditsEarned + ", " + creditsEarned;
