@@ -70,10 +70,7 @@ public class Main extends JavaPlugin {
 
             File file = new File("./plugins/HitW/playerdata/monthly/"+uuid+".json");
             if (!file.exists()) {
-                file = new File("./plugins/HitW/playerdata/"+uuid+".json");
-                if (!file.exists()) {
-                    return "0, 0";
-                }
+                return "0, 0";
             }
 
             List<String> lines = Files.readAllLines(file.toPath());
