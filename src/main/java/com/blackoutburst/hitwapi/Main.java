@@ -68,9 +68,12 @@ public class Main extends JavaPlugin {
                 uuid = new String(dashedUUID);
             }
 
-            final File file = new File("./plugins/HitW/playerdata/"+uuid+".json");
+            File file = new File("./plugins/HitW/playerdata/monthly/"+uuid+".json");
             if (!file.exists()) {
-                return "0, 0";
+                file = new File("./plugins/HitW/playerdata/"+uuid+".json");
+                if (!file.exists()) {
+                    return "0, 0";
+                }
             }
 
             List<String> lines = Files.readAllLines(file.toPath());
