@@ -1,5 +1,6 @@
 package com.blackoutburst.hitwapi;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
@@ -92,8 +93,9 @@ public class Main extends JavaPlugin {
             JsonParser parser = new JsonParser();
             JsonObject data = parser.parse(fileContents).getAsJsonObject().get("data").getAsJsonObject();
 
-            int month = data.get("month").getAsInt();
-            if (month != currentMonth) return "0, 0";
+            JsonElement month = data.get("month");
+            if (month == null) return "0, 0";
+            if (month.getAsInt() != currentMonth) return "0, 0";
 
             int creditsEarned = data.get("creditsEarned").getAsInt();
 
