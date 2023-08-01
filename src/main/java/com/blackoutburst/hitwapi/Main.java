@@ -77,14 +77,6 @@ public class Main extends JavaPlugin {
             }
             int currentMonth = Calendar.getInstance(TimeZone.getTimeZone("EST")).get(Calendar.MONTH);
 
-            //temporary workaround until the datafixer is ran on everybody
-            if (currentMonth == 6) {
-                file = new File("./plugins/HitW/playerdata/"+uuid+".json");
-                if (!file.exists()) {
-                    return "0, 0";
-                }
-            }
-
             List<String> lines = Files.readAllLines(file.toPath());
             StringBuilder s = new StringBuilder();
             lines.forEach(s::append);
@@ -228,10 +220,12 @@ public class Main extends JavaPlugin {
             uuid = String.copyValueOf(dashedUUID);
         }
 
-        final File file = new File("./plugins/HitW/playerdata/"+uuid+".json");
+        File file = new File("./plugins/HitW/playerdata/monthly/"+uuid+".json");
         if (!file.exists()) {
             return "null";
         }
+
+        int currentMonth = Calendar.getInstance(TimeZone.getTimeZone("EST")).get(Calendar.MONTH);
 
         try {
             List<String> lines = Files.readAllLines(file.toPath());
@@ -242,10 +236,13 @@ public class Main extends JavaPlugin {
             JsonParser parser = new JsonParser();
             JsonObject data = parser.parse(fileContents).getAsJsonObject().get("data").getAsJsonObject();
 
-            int credits = data.get("credits").getAsInt();
+            JsonElement month = data.get("month");
+            if (month != null) {
+                if (month.getAsInt() != currentMonth) return "0, 0";
+            }
             int creditsEarned = data.get("creditsEarned").getAsInt();
 
-            return credits + ", " + creditsEarned;
+            return creditsEarned + ", " + creditsEarned;
         } catch(Exception e) {
             return "0, 0";
         }
