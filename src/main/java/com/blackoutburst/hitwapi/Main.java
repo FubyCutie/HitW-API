@@ -222,7 +222,7 @@ public class Main extends JavaPlugin {
 
         File file = new File("./plugins/HitW/playerdata/monthly/"+uuid+".json");
         if (!file.exists()) {
-            return "null";
+            return "0, 0";
         }
 
         int currentMonth = Calendar.getInstance(TimeZone.getTimeZone("EST")).get(Calendar.MONTH);
